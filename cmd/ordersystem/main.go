@@ -8,6 +8,7 @@ import (
 
 	"clean-arch/configs"
 	"clean-arch/internal/event/handler"
+	"clean-arch/internal/infra/database/migrations"
 	"clean-arch/internal/infra/graph"
 	"clean-arch/internal/infra/grpc/pb"
 	"clean-arch/internal/infra/grpc/service"
@@ -16,11 +17,14 @@ import (
 
 	graphql_handler "github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/golang-migrate/migrate/v4"
+	migratemysql "github.com/golang-migrate/migrate/v4/database/mysql"
+	"github.com/golang-migrate/migrate/v4/source/iofs"
 	"github.com/streadway/amqp"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
-	// mysql
+	// mysql driver
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -36,6 +40,8 @@ func main() {
 	}
 	defer db.Close()
 
+	runMigrations(db)
+
 	rabbitMQChannel := getRabbitMQChannel(configs.RabbitMQURL)
 
 	eventDispatcher := events.NewEventDispatcher()
@@ -48,6 +54,7 @@ func main() {
 	webserver := webserver.NewWebServer(configs.WebServerPort)
 	webOrderHandler := NewWebOrderHandler(db, eventDispatcher)
 	webserver.AddHandler("/order", webOrderHandler.Create)
+	webserver.AddGetHandler("/order", webOrderHandler.List)
 	fmt.Println("Starting web server on port", configs.WebServerPort)
 	go webserver.Start()
 
@@ -71,6 +78,24 @@ func main() {
 
 	fmt.Println("Starting GraphQL server on port", configs.GraphQLServerPort)
 	if err := http.ListenAndServe(":"+configs.GraphQLServerPort, nil); err != nil {
+		panic(err)
+	}
+}
+
+func runMigrations(db *sql.DB) {
+	driver, err := migratemysql.WithInstance(db, &migratemysql.Config{})
+	if err != nil {
+		panic(err)
+	}
+	src, err := iofs.New(migrations.FS, ".")
+	if err != nil {
+		panic(err)
+	}
+	m, err := migrate.NewWithInstance("iofs", src, "mysql", driver)
+	if err != nil {
+		panic(err)
+	}
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
 		panic(err)
 	}
 }
