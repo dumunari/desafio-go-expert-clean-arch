@@ -51,14 +51,14 @@ As migrations do banco rodam automaticamente ao iniciar a aplicação.
 
 ## Serviços e portas
 
-| Serviço              | Porta  | Observação                                  |
-|-----------------------|--------|-----------------------------------------------|
-| REST                  | 8000   | requests prontos em `api/*.http`               |
-| gRPC                  | 50051  | `OrderService`, com reflection habilitada      |
-| GraphQL               | 8090   | Playground em `http://localhost:8090`          |
-| MySQL                 | 3306   | usuário/senha `root`/`root`, banco `orders`    |
-| RabbitMQ              | 5672   | AMQP                                           |
-| RabbitMQ (management) | 15672  | usuário/senha `guest`/`guest`                  |
+| Serviço               | Porta  | Observação                                          |
+|-----------------------|--------|-----------------------------------------------------|
+| REST                  | 8000   | requests prontos em `api.http`, na raiz do projeto  |
+| gRPC                  | 50051  | `OrderService`, com reflection habilitada           |
+| GraphQL               | 8090   | Playground em `http://localhost:8090`               |
+| MySQL                 | 3306   | usuário/senha `root`/`root`, banco `orders`         |
+| RabbitMQ              | 5672   | AMQP                                                |
+| RabbitMQ (management) | 15672  | usuário/senha `guest`/`guest`                       |
 
 ## Operações disponíveis
 
@@ -71,7 +71,8 @@ As migrations do banco rodam automaticamente ao iniciar a aplicação.
 
 ### REST
 
-> Os arquivos [`api/create_order.http`](api/create_order.http) e [`api/list_orders.http`](api/list_orders.http) contêm esses mesmos exemplos, prontos pra usar. Abra-os no VS Code com a extensão [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) e clique em **"Send Request"**.
+> O arquivo `api.http`, na raiz do projeto, contém esses mesmos exemplos, prontos pra usar.  
+> Abra-os no VS Code com a extensão [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) e clique em **"Send Request"**.
 
 Criar pedido:
 
