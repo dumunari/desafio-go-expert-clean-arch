@@ -7,7 +7,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o server ./cmd/ordersystem/main.go ./cmd/ordersystem/wire_gen.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o server ./cmd/ordersystem/main.go ./cmd/ordersystem/wire_gen.go
 
 FROM scratch
 
